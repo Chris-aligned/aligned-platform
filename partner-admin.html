@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Partner Master View | Aligned Web Services</title>
+<link rel="icon" href="favicon.svg">
+<style>
+  :root{
+    --bg:#070a11; --panel:#0f141e; --panel2:#141b28; --line:#222c3c;
+    --text:#eef2fb; --muted:#9aa6bd; --muted2:#71809a;
+    --purple:#9B6BE0; --green:#16A34A;
+    --grad:linear-gradient(135deg,#9B6BE0,#16A34A);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Arial,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:920px;margin:0 auto;padding:28px 18px 60px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.14em;font-size:12px;color:var(--muted);text-transform:uppercase;margin-bottom:22px}
+  .brand .dot{width:26px;height:26px;border-radius:8px;background:var(--grad);flex:none}
+  .hero{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:24px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap}
+  .hero:before{content:"";position:absolute;inset:0;background:var(--grad);opacity:.08}
+  .hero .inner{position:relative}
+  .eyebrow{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--purple)}
+  h1{margin:6px 0 2px;font-size:24px;font-weight:800;line-height:1.15}
+  .sub{color:var(--muted);font-size:14px;margin:0}
+  .total{position:relative;text-align:right}
+  .total .n{font-size:34px;font-weight:800;background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;line-height:1}
+  .total .c{font-size:12.5px;color:var(--muted);margin-top:6px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px;margin-top:20px}
+  .card h2{margin:0 0 14px;font-size:16px;font-weight:800}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th{text-align:left;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted2);font-weight:700;padding:0 10px 10px;border-bottom:1px solid var(--line)}
+  th.num,td.num{text-align:right}
+  td{padding:13px 10px;border-bottom:1px solid var(--line);color:var(--text)}
+  tr:last-child td{border-bottom:0}
+  td .code{font-size:12.5px;color:var(--muted2)}
+  td .earn{font-weight:800;background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .keyform{max-width:420px;margin:40px auto;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:26px}
+  .keyform label{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted2);margin-bottom:8px}
+  .keyform input{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:10px;color:var(--text);padding:12px;font-size:15px;font-family:inherit}
+  .keyform input:focus{outline:none;border-color:var(--purple)}
+  .keyform button{margin-top:14px;width:100%;background:var(--grad);border:0;color:#fff;font-weight:800;font-size:15px;padding:13px;border-radius:11px;cursor:pointer}
+  .empty{text-align:center;padding:34px 16px;color:var(--muted)}
+  .foot{text-align:center;color:var(--muted2);font-size:12px;margin-top:30px}
+  .loading,.errbox{text-align:center;padding:50px 16px;color:var(--muted)}
+  .cardhead{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+  .cardhead h2{margin:0}
+  .runbtn{background:var(--grad);border:0;color:#fff;font-weight:800;font-size:13.5px;padding:11px 18px;border-radius:10px;cursor:pointer;white-space:nowrap}
+  .runbtn:active{transform:translateY(1px)}
+  .runbtn:disabled{opacity:.6;cursor:default}
+  .pyes{color:#8fe0ad;font-weight:700;font-size:12.5px}
+  .pno{color:#71809a;font-weight:700;font-size:12.5px}
+  .payres{margin-top:16px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:16px 16px;font-size:14px;color:var(--text);display:none;white-space:pre-wrap;line-height:1.55}
+  .payres.show{display:block}
+  @media(max-width:560px){.total{text-align:left}h1{font-size:21px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand"><span class="dot"></span> Aligned Web Services</div>
+  <div id="root"><div class="loading">Loading...</div></div>
+  <div class="foot">Master partner view &middot; Commission is 30% of each active referred customer's monthly plan.</div>
+</div>
+<script>
+  var MASTER_URL = 'https://alignedwebservices.app.n8n.cloud/webhook/affiliate-master';
+  var RUN_URL = 'https://alignedwebservices.app.n8n.cloud/webhook/run-payouts';
+  var _key = '';
+  var _data = null;
+  function qp(n){ var m=(location.search||'').match(new RegExp('[?&]'+n+'=([^&]+)')); return m?decodeURIComponent(m[1]):''; }
+  function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function money(n){ n=Number(n)||0; return '$'+n.toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+  function keyForm(msg){
+    var root=document.getElementById('root');
+    root.innerHTML='<div class="keyform"><label>Admin key</label><input id="k" type="password" placeholder="Paste your admin key" autocomplete="off">'+
+      (msg?'<div style="color:#f0a6a0;font-size:13px;margin-top:10px">'+esc(msg)+'</div>':'')+
+      '<button id="go">View partner earnings</button></div>';
+    document.getElementById('go').onclick=function(){ var k=(document.getElementById('k').value||'').trim(); if(!k){ keyForm('Enter your admin key first.'); return; } load(k); };
+    document.getElementById('k').addEventListener('keydown',function(e){ if(e.key==='Enter') document.getElementById('go').click(); });
+  }
+  function render(d){
+    _data=d;
+    var root=document.getElementById('root');
+    var list=Array.isArray(d.affiliates)?d.affiliates:[];
+    var html='';
+    html+='<div class="hero"><div class="inner"><div class="eyebrow">Partner master view</div><h1>All partner earnings</h1><p class="sub">'+list.length+' partner'+(list.length===1?'':'s')+' in the program, sorted by monthly earnings.</p></div>';
+    html+='<div class="total"><div class="n">'+money(d.grandTotalMonthly)+'</div><div class="c">Total monthly payout</div></div></div>';
+    html+='<div class="card"><div class="cardhead"><h2>Partners</h2>'+
+      '<button id="runBtn" class="runbtn" onclick="runPayouts()">Run monthly payouts</button></div>';
+    if(!list.length){
+      html+='<div class="empty">No partners yet. Approved affiliates appear here automatically once their link is issued.</div>';
+    } else {
+      html+='<table><thead><tr><th>Partner</th><th>Code</th><th class="num">Referrals</th><th class="num">Active</th><th>Payouts</th><th class="num">Monthly earnings</th></tr></thead><tbody>';
+      list.forEach(function(a){
+        var connected=!!(a.connected||a.hasStripeAccount);
+        var pay=connected?'<span class="pyes">Connected</span>':'<span class="pno">Not set up</span>';
+        html+='<tr><td>'+esc(a.name||'-')+'<div class="code">'+esc(a.email||'')+'</div></td>'+
+          '<td><span class="code">'+esc(a.refCode||'')+'</span></td>'+
+          '<td class="num">'+(a.referralCount||0)+'</td>'+
+          '<td class="num">'+(a.activeCount||0)+'</td>'+
+          '<td>'+pay+'</td>'+
+          '<td class="num"><span class="earn">'+money(a.monthlyEarnings)+'</span></td></tr>';
+      });
+      html+='</tbody></table>';
+    }
+    html+='<div class="payres" id="payoutResult"></div>';
+    html+='</div>';
+    root.innerHTML=html;
+  }
+  function runPayouts(){
+    var affs=(_data && Array.isArray(_data.affiliates))?_data.affiliates:[];
+    var payable=affs.filter(function(a){ return (a.connected||a.hasStripeAccount) && Number(a.monthlyEarnings)>0; });
+    var total=payable.reduce(function(s,a){ return s+(Number(a.monthlyEarnings)||0); },0);
+    total=Math.round(total*100)/100;
+    var n=payable.length;
+    if(n===0){ alert('No connected partners with earnings to pay right now.'); return; }
+    if(!confirm('This will send real money: '+money(total)+' to '+n+' partner'+(n===1?'':'s')+'. Continue?')) return;
+    var btn=document.getElementById('runBtn');
+    if(btn){ btn.disabled=true; btn.textContent='Sending payouts...'; }
+    fetch(RUN_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key:_key})})
+      .then(function(r){ return r.json(); })
+      .then(function(res){ showPayoutSummary(res); if(btn){ btn.disabled=false; btn.textContent='Run monthly payouts'; } })
+      .catch(function(){ alert('Could not reach the server. Please try again.'); if(btn){ btn.disabled=false; btn.textContent='Run monthly payouts'; } });
+  }
+  function showPayoutSummary(res){
+    res=res||{};
+    var paid=Array.isArray(res.paid)?res.paid:[];
+    var skipped=Array.isArray(res.skipped)?res.skipped:[];
+    var lines=[];
+    lines.push('Payout run complete. Paid '+money(res.totalPaid||0)+' to '+paid.length+' partner'+(paid.length===1?'':'s')+'.');
+    paid.forEach(function(p){ lines.push('  '+(p.name||'')+': '+money(p.amount)); });
+    if(res.failed){ lines.push(''); lines.push(res.failed+' transfer'+(res.failed===1?'':'s')+' failed and were not paid.'); }
+    if(skipped.length){ lines.push(''); lines.push('Skipped '+skipped.length+':'); skipped.forEach(function(s){ lines.push('  '+(s.name||'')+' ('+(s.reason||'')+')'); }); }
+    var el=document.getElementById('payoutResult');
+    if(el){ el.textContent=lines.join('\n'); el.classList.add('show'); }
+  }
+  function load(key){
+    _key=key;
+    var root=document.getElementById('root');
+    root.innerHTML='<div class="loading">Loading partner earnings...</div>';
+    fetch(MASTER_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key:key})})
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        if(!d || d.ok===false || d.error==='unauthorized'){ keyForm('That admin key is not valid.'); return; }
+        render(d);
+      })
+      .catch(function(){ root.innerHTML='<div class="errbox">We could not reach the server. Please refresh and try again.</div>'; });
+  }
+  function boot(){
+    var key=(qp('key')||'').trim();
+    if(key){ load(key); } else { keyForm(''); }
+  }
+  boot();
+</script>
+</body>
+</html>
