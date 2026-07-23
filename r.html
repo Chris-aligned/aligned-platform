@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Opening…</title>
+<style>
+  body{background:#0f1117;color:#c4ccda;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;text-align:center;padding:24px}
+  .sp{width:34px;height:34px;border:3px solid rgba(124,92,255,.25);border-top-color:#7c5cff;border-radius:50%;animation:s .8s linear infinite;margin:0 auto 14px}
+  @keyframes s{to{transform:rotate(360deg)}}
+  a{color:#9b8cff}
+</style>
+</head><body>
+<div>
+  <div class="sp" id="sp"></div>
+  <div id="m">Opening your video…</div>
+</div>
+<script>
+(function(){
+  var m=location.pathname.match(/\/r\/([A-Za-z0-9]+)/);
+  var code=m?m[1]:'';
+  function fail(t){ var sp=document.getElementById('sp'); if(sp)sp.style.display='none'; document.getElementById('m').innerHTML=t; }
+  if(!code){ fail('Link not found. <br><a href="https://app.alignedwebservices.ca">Go to your dashboard</a>'); return; }
+  fetch('https://alignedwebservices.app.n8n.cloud/webhook/resolve?c='+encodeURIComponent(code))
+    .then(function(r){return r.json();})
+    .then(function(j){ if(j&&j.url){ location.replace(j.url); } else { fail('This link has expired or was not found. <br><a href="https://app.alignedwebservices.ca">Go to your dashboard</a>'); } })
+    .catch(function(){ fail('Could not open the link. Please try again, or <a href="https://app.alignedwebservices.ca">open your dashboard</a>.'); });
+})();
+</script>
+</body></html>
