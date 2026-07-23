@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Your Partner Dashboard | Aligned Web Services</title>
+<link rel="icon" href="favicon.svg">
+<style>
+  :root{
+    --bg:#070a11; --panel:#0f141e; --panel2:#141b28; --line:#222c3c;
+    --text:#eef2fb; --muted:#9aa6bd; --muted2:#71809a;
+    --purple:#9B6BE0; --green:#16A34A;
+    --grad:linear-gradient(135deg,#9B6BE0,#16A34A);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Arial,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:820px;margin:0 auto;padding:28px 18px 60px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.14em;font-size:12px;color:var(--muted);text-transform:uppercase;margin-bottom:22px}
+  .brand .dot{width:26px;height:26px;border-radius:8px;background:var(--grad);flex:none}
+  .hero{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:26px 24px;position:relative;overflow:hidden}
+  .hero:before{content:"";position:absolute;inset:0;background:var(--grad);opacity:.08}
+  .hero .inner{position:relative}
+  .eyebrow{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--purple)}
+  h1{margin:6px 0 2px;font-size:27px;font-weight:800;line-height:1.15}
+  .sub{color:var(--muted);font-size:14.5px;margin:0}
+  .linkbox{margin-top:20px;background:var(--panel2);border:1px solid var(--line);border-radius:13px;padding:14px 15px}
+  .linkbox .lbl{font-size:11.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted2);margin-bottom:8px}
+  .linkrow{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .linkrow .url{flex:1;min-width:220px;font-size:15px;font-weight:700;color:var(--text);word-break:break-all}
+  .copybtn{background:var(--grad);border:0;color:#fff;font-weight:800;font-size:13.5px;padding:11px 18px;border-radius:10px;cursor:pointer;white-space:nowrap}
+  .copybtn:active{transform:translateY(1px)}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 15px}
+  .stat .n{font-size:26px;font-weight:800;line-height:1}
+  .stat .n.money{background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .stat .c{font-size:12.5px;color:var(--muted);margin-top:6px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px 20px;margin-top:20px}
+  .card h2{margin:0 0 14px;font-size:16px;font-weight:800}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th{text-align:left;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted2);font-weight:700;padding:0 10px 10px;border-bottom:1px solid var(--line)}
+  td{padding:13px 10px;border-bottom:1px solid var(--line);color:var(--text)}
+  tr:last-child td{border-bottom:0}
+  .pill{display:inline-block;font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:20px}
+  .pill.trial{color:#f0c987;background:rgba(224,163,58,.16)}
+  .pill.active{color:#8fe0ad;background:rgba(22,163,74,.18)}
+  .pill.churned{color:#f0a6a0;background:rgba(224,90,79,.16)}
+  .empty{text-align:center;padding:34px 16px;color:var(--muted)}
+  .empty .big{font-size:34px;margin-bottom:10px}
+  .empty h3{margin:0 0 6px;font-size:17px;color:var(--text)}
+  .foot{text-align:center;color:var(--muted2);font-size:12px;margin-top:30px}
+  .loading,.errbox{text-align:center;padding:50px 16px;color:var(--muted)}
+  .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:#1b2433;border:1px solid var(--line);color:var(--text);padding:12px 18px;border-radius:12px;font-size:14px;font-weight:600;opacity:0;transition:.25s;pointer-events:none;z-index:50}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .payok{display:flex;gap:12px;align-items:center}
+  .pdot{width:12px;height:12px;border-radius:50%;background:var(--green);box-shadow:0 0 0 4px rgba(22,163,74,.18);flex:none}
+  .ptitle{font-weight:800;color:#8fe0ad;font-size:15px}
+  .psub{color:var(--muted);font-size:14px}
+  .connectbtn{background:var(--grad);border:0;color:#fff;font-weight:800;font-size:14.5px;padding:13px 20px;border-radius:11px;cursor:pointer}
+  .connectbtn:active{transform:translateY(1px)}
+  .connectbtn:disabled{opacity:.6;cursor:default}
+  @media(max-width:560px){.stats{grid-template-columns:1fr}h1{font-size:23px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand"><span class="dot"></span> Aligned Web Services</div>
+  <div id="root"><div class="loading">Loading your dashboard...</div></div>
+  <div class="foot">Aligned Partner Program &middot; You earn 30% recurring while every customer you refer stays active.</div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+  var STATS_URL = 'https://alignedwebservices.app.n8n.cloud/webhook/affiliate-stats';
+  var CONNECT_URL = 'https://alignedwebservices.app.n8n.cloud/webhook/affiliate-connect';
+  var _code = '';
+  function qp(n){ var m=(location.search||'').match(new RegExp('[?&]'+n+'=([^&]+)')); return m?decodeURIComponent(m[1]):''; }
+  function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function money(n){ n=Number(n)||0; return '$'+n.toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+  function fmtDate(s){ if(!s) return '-'; var d=new Date(s); if(isNaN(d)) return '-'; return d.toLocaleDateString('en-CA',{year:'numeric',month:'short',day:'numeric'}); }
+  function planLabel(p){ p=(p||'').toString(); return p?p.charAt(0).toUpperCase()+p.slice(1):'-'; }
+  function statusPill(s){ s=(s||'trial').toString().toLowerCase(); var cls=s==='active'?'active':(s==='churned'?'churned':'trial'); var lbl=s.charAt(0).toUpperCase()+s.slice(1); return '<span class="pill '+cls+'">'+esc(lbl)+'</span>'; }
+  var _toastT;
+  function toast(msg){ var t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(_toastT); _toastT=setTimeout(function(){ t.classList.remove('show'); },2200); }
+  var _link='';
+  function copyLink(){
+    if(!_link) return;
+    function ok(){ toast('Link copied. Share it anywhere.'); }
+    if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(_link).then(ok).catch(fallback); } else { fallback(); }
+    function fallback(){ try{ var ta=document.createElement('textarea'); ta.value=_link; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); ok(); }catch(e){ toast('Copy failed, select the link manually.'); } }
+  }
+  function connectPayouts(){
+    var btn=document.getElementById('connectBtn');
+    if(!_code){ toast('Missing your partner code.'); return; }
+    if(btn){ btn.disabled=true; btn.textContent='Opening secure setup...'; }
+    fetch(CONNECT_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:_code})})
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        if(d && d.url){ window.location.href=d.url; return; }
+        toast('Could not start payout setup. Please try again.');
+        if(btn){ btn.disabled=false; btn.textContent='Set up automatic payouts'; }
+      })
+      .catch(function(){ toast('Could not reach the server. Please try again.'); if(btn){ btn.disabled=false; btn.textContent='Set up automatic payouts'; } });
+  }
+  function render(d){
+    var root=document.getElementById('root');
+    var name=(d.name||'').trim();
+    _link=d.refLink||'';
+    var counts=d.counts||{total:0,active:0};
+    var list=Array.isArray(d.referralsList)?d.referralsList:[];
+    var hello=name?('Welcome, '+esc(name.split(' ')[0])):'Welcome, partner';
+    var html='';
+    html+='<div class="hero"><div class="inner">';
+    html+='<div class="eyebrow">Partner dashboard</div>';
+    html+='<h1>'+hello+'</h1>';
+    html+='<p class="sub">Here is how your Aligned partner link is performing.</p>';
+    html+='<div class="linkbox"><div class="lbl">Your partner link</div><div class="linkrow"><div class="url">'+esc(_link)+'</div><button class="copybtn" onclick="copyLink()">Copy link</button></div></div>';
+    html+='</div></div>';
+    html+='<div class="stats">';
+    html+='<div class="stat"><div class="n money">'+money(d.monthlyEarnings)+'</div><div class="c">Your monthly earnings</div></div>';
+    html+='<div class="stat"><div class="n">'+(counts.active||0)+'</div><div class="c">Active referrals</div></div>';
+    html+='<div class="stat"><div class="n">'+(counts.total||0)+'</div><div class="c">Total referrals</div></div>';
+    html+='</div>';
+    var connectedState = (String(d.payoutsReady||'').toLowerCase()==='yes') || qp('connected')==='1';
+    var hasAccount = !!d.connected || !!d.hasStripeAccount;
+    html+='<div class="card"><h2>Automatic payouts</h2>';
+    if(connectedState){
+      html+='<div class="payok"><span class="pdot"></span><div><div class="ptitle">Payouts connected</div><div class="psub">Your commissions are paid to your bank automatically through Stripe.</div></div></div>';
+    } else {
+      var btnLabel = hasAccount ? 'Finish setting up payouts' : 'Set up automatic payouts';
+      html+='<p class="psub" style="margin:0 0 14px">Connect your bank once through Stripe and your 30% commissions get paid out to you automatically. It takes about two minutes.</p>';
+      html+='<button id="connectBtn" class="connectbtn" onclick="connectPayouts()">'+btnLabel+'</button>';
+    }
+    html+='</div>';
+    html+='<div class="card"><h2>Your referrals</h2>';
+    if(!list.length){
+      html+='<div class="empty"><div class="big">&#128640;</div><h3>Share your link to start earning</h3><p>Post it, text it, add it to your bio or emails. Every customer who signs up through your link earns you 30% recurring for as long as they stay.</p></div>';
+    } else {
+      html+='<table><thead><tr><th>Name</th><th>Plan</th><th>Status</th><th>Joined</th></tr></thead><tbody>';
+      list.forEach(function(r){
+        html+='<tr><td>'+esc(r.referredName||'A new customer')+'</td><td>'+esc(planLabel(r.plan))+'</td><td>'+statusPill(r.status)+'</td><td>'+esc(fmtDate(r.signupAt))+'</td></tr>';
+      });
+      html+='</tbody></table>';
+    }
+    html+='</div>';
+    root.innerHTML=html;
+  }
+  function boot(){
+    var code=(qp('code')||'').trim().toLowerCase();
+    _code=code;
+    var root=document.getElementById('root');
+    if(!code){ root.innerHTML='<div class="errbox">This dashboard link is missing your partner code. Please use the link we emailed you.</div>'; return; }
+    fetch(STATS_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:code})})
+      .then(function(r){ return r.json(); })
+      .then(function(d){ if(!d||d.ok===false){ root.innerHTML='<div class="errbox">We could not load this dashboard right now. Please try again in a moment.</div>'; return; } render(d); })
+      .catch(function(){ root.innerHTML='<div class="errbox">We could not reach the server. Please check your connection and refresh.</div>'; });
+  }
+  boot();
+</script>
+</body>
+</html>
