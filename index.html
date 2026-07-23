@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- Aligned customer app - build av78 (single Creator plan; ultra avatar + premium-thumbnail-included removed; thumbnails now an optional credit add-on for everyone; light/dark theme toggle (dark default); Suggest-a-feature feedback -> /webhook/feedback) -->
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Aligned - Dashboard</title>
+<meta name="description" content="Aligned is an AI content engine that makes short-form videos in your own voice every day - captioned, scheduled, and auto-posted to your socials after you approve."/>
+<meta name="theme-color" content="#0B0E14"/>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
+<link rel="apple-touch-icon" href="/icon-180.png"/>
+<link rel="manifest" href="/manifest.webmanifest"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+<meta name="apple-mobile-web-app-title" content="Aligned"/>
+<!-- Open Graph / link preview -->
+<meta property="og:type" content="website"/>
+<meta property="og:site_name" content="Aligned Web Services"/>
+<meta property="og:title" content="Aligned - your AI content engine"/>
+<meta property="og:description" content="Make short-form videos in your own voice every day - captioned, scheduled, and auto-posted after you approve."/>
+<meta property="og:image" content="https://app.alignedwebservices.ca/og-image.png"/>
+<meta property="og:url" content="https://app.alignedwebservices.ca/"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="Aligned - your AI content engine"/>
+<meta name="twitter:description" content="Short-form videos in your own voice, made and posted for you every day."/>
+<meta name="twitter:image" content="https://app.alignedwebservices.ca/og-image.png"/>
+<!-- Public app schema (login screen is indexable; the dashboard behind it is not) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Aligned Content Engine",
+  "applicationCategory": "MultimediaApplication",
+  "operatingSystem": "Web",
+  "url": "https://app.alignedwebservices.ca/",
+  "description": "An AI content engine for small businesses. Your AI twin makes short-form videos in your real voice every day, captioned, scheduled, and auto-posted to your social accounts after you approve them.",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Aligned Web Services",
+    "url": "https://alignedwebservices.ca"
+  },
+  "offers": {
+    "@type": "Offer",
+    "priceCurrency": "CAD",
+    "price": "97"
+  }
+}
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<!-- Apply the saved theme before paint so there's no flash. Dark is the default. -->
+<script>(function(){try{var t=localStorage.getItem('aws_theme');document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark');}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();</script>
+<style>
+  :root{
+    --bg:#0B0E14; --panel:#141925; --panel2:#10141f; --line:#222b3d;
+    --text:#EAF1F8; --muted:#adb5c9; --muted2:#98a0b6;
+    --purple:#9B6BE0; --purple2:#7C3FC4; --green:#16A34A; --green2:#19C3B2;
+    --amber:#E0A33A; --red:#E0564A; --blue:#3B82F6;
+    --grad:linear-gradient(135deg,var(--purple),var(--green));
+  }
+  /* Light theme: dark-on-light, same purple/green brand accents. Dark stays the default. */
+  html[data-theme="light"]{
+    --bg:#F4F6FB; --panel:#FFFFFF; --panel2:#EEF1F8; --line:#DBE1EC;
+    --text:#1A2130; --muted:#5A6478; --muted2:#7C8598;
+    --purple:#7C3FC4; --purple2:#6A2FB0; --green:#15963F; --green2:#0E9E90;
+    --amber:#B5791C; --red:#D0463A; --blue:#2563EB;
+  }
+  html[data-theme="light"] body{background:var(--bg);}
+  html[data-theme="light"] input,html[data-theme="light"] select,html[data-theme="light"] textarea{background:#FFFFFF;color:var(--text);}
+  html[data-theme="light"] .btn.ghost{background:#EEF1F8;color:var(--text);}
+  html[data-theme="light"] .btn.secondary{color:var(--text);}
+  html[data-theme="light"] .chip{background:#EEF1F8;}
+  html[data-theme="light"] .topbar{background:rgba(244,246,251,.85);}
+  html[data-theme="light"] .auth{background:radial-gradient(120% 80% at 50% -10%, #E7ECF7 0%, #F4F6FB 60%);}
+  html[data-theme="light"] .ava,html[data-theme="light"] .cap,html[data-theme="light"] .extras{background:#F7F9FD;}
+  *{box-sizing:border-box;}
+  html,body{margin:0;height:100%;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:inherit;cursor:pointer;}
+  .hidden{display:none !important;}
+
+  .logo{display:flex;align-items:center;gap:10px;}
+  .logo .wm{font-weight:800;letter-spacing:.4px;font-size:16px;line-height:1;}
+  .logo .wm small{display:block;font-size:8.5px;letter-spacing:3px;font-weight:700;color:var(--muted);margin-top:3px;}
+
+  .auth{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;
+    background:radial-gradient(120% 80% at 50% -10%, #1a2138 0%, #0B0E14 60%);}
+  .auth-card{width:100%;max-width:420px;background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:32px 28px;box-shadow:0 30px 80px rgba(0,0,0,.5);}
+  .auth-card .logo{justify-content:center;margin-bottom:24px;}
+  .auth h1{font-size:25px;margin:0 0 6px;text-align:center;font-weight:800;}
+  .auth p.sub{color:var(--muted);font-size:14px;text-align:center;margin:0 0 22px;line-height:1.5;}
+  .field{margin-bottom:14px;}
+  label{display:block;font-size:12px;color:var(--muted);margin:0 0 7px;font-weight:600;}
+  input,select,textarea{width:100%;background:#0e1320;border:1px solid var(--line);color:var(--text);border-radius:12px;padding:13px;font-size:15px;outline:none;transition:border .15s;}
+  input:focus,select:focus,textarea:focus{border-color:var(--purple);}
+  textarea{resize:vertical;min-height:90px;font-family:inherit;}
+  .btn{width:100%;border:0;border-radius:12px;padding:14px;font-size:15px;font-weight:800;color:#fff;background:var(--grad);transition:transform .08s,opacity .15s;}
+  .btn:hover{opacity:.94;} .btn:active{transform:translateY(1px);}
+  .btn.secondary{background:transparent;border:1px solid var(--line);color:var(--text);}
+  .btn.ghost{background:#0e1320;border:1px solid var(--line);color:var(--text);}
+  .btn.small{width:auto;padding:9px 16px;font-size:13px;border-radius:10px;}
+  .btn.green{background:linear-gradient(135deg,#1aa84e,#0f7d39);}
+  .btn.danger{background:transparent;border:1px solid #4a2630;color:#f0a097;}
+  .switch{text-align:center;margin-top:16px;font-size:13px;color:var(--muted);}
+  .switch b{color:var(--purple);cursor:pointer;}
+  .trial-pill{display:inline-flex;align-items:center;gap:7px;background:rgba(155,107,224,.12);border:1px solid rgba(155,107,224,.3);color:#cbb4f0;font-size:12px;font-weight:700;padding:6px 12px;border-radius:999px;margin:0 auto 18px;}
+  .trial-pill .dot{width:7px;height:7px;border-radius:50%;background:var(--green);}
+
+  .app{display:none;min-height:100vh;}
+  .app.show{display:grid;grid-template-columns:240px 1fr;}
+  .side{background:var(--panel2);border-right:1px solid var(--line);padding:22px 16px;display:flex;flex-direction:column;gap:6px;position:sticky;top:0;height:100vh;}
+  .side .logo{padding:4px 8px 18px;}
+  .nav{display:flex;flex-direction:column;gap:3px;flex:1;}
+  .nav a{display:flex;align-items:center;gap:11px;padding:11px 12px;border-radius:11px;color:var(--muted);font-size:14.5px;font-weight:600;transition:.12s;}
+  .nav a:hover{background:#161c2a;color:var(--text);}
+  .nav a.active{background:rgba(155,107,224,.14);color:#fff;}
+  .nav a .ic{width:18px;height:18px;flex:none;opacity:.9;}
+  .nav a .badge{margin-left:auto;background:var(--purple);color:#fff;font-size:11px;font-weight:800;min-width:18px;height:18px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 5px;}
+  .side .userbox{border-top:1px solid var(--line);padding-top:14px;margin-top:8px;display:flex;align-items:center;gap:10px;}
+  .avatar-dot{width:34px;height:34px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#fff;flex:none;}
+  .userbox .nm{font-size:13px;font-weight:700;line-height:1.2;}
+  .userbox .em{font-size:11px;color:var(--muted2);}
+
+  .main{min-width:0;display:flex;flex-direction:column;}
+  .topbar{display:flex;align-items:center;gap:14px;padding:16px 28px;border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,14,20,.85);backdrop-filter:blur(8px);z-index:10;}
+  .topbar h2{font-size:18px;margin:0;font-weight:800;}
+  .topbar .spacer{flex:1;}
+  .trialbar{display:flex;align-items:center;gap:10px;font-size:13px;color:#e7d6ff;background:rgba(155,107,224,.1);border:1px solid rgba(155,107,224,.28);padding:7px 12px;border-radius:11px;}
+  .trialbar b{color:#fff;}
+  .content{padding:26px 28px 60px;max-width:1080px;width:100%;}
+
+  .grid{display:grid;gap:16px;}
+  .cards3{grid-template-columns:repeat(3,1fr);}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;}
+  .stat .k{font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px;}
+  .stat .v{font-size:30px;font-weight:800;margin-top:6px;}
+  .stat .v small{font-size:14px;color:var(--muted);font-weight:600;}
+  .sect-title{font-size:13px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700;margin:30px 0 12px;}
+  .hero{background:linear-gradient(135deg,rgba(155,107,224,.16),rgba(22,163,74,.12));border:1px solid rgba(155,107,224,.25);border-radius:18px;padding:24px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;}
+  .hero h3{margin:0 0 5px;font-size:20px;}
+  .hero p{margin:0;color:var(--muted);font-size:14px;}
+  .hero .spacer{flex:1;}
+
+  .badge-status{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:999px;}
+  .badge-status .d{width:6px;height:6px;border-radius:50%;}
+  .s-processing{background:rgba(224,163,58,.14);color:#e7c17e;} .s-processing .d{background:var(--amber);}
+  .s-review{background:rgba(59,130,246,.14);color:#9cc0ff;} .s-review .d{background:var(--blue);}
+  .s-ready{background:rgba(25,195,178,.14);color:#8fe6da;} .s-ready .d{background:var(--green2);}
+  .s-posted{background:rgba(22,163,74,.16);color:#86e3a5;} .s-posted .d{background:var(--green);}
+  .s-rejected{background:rgba(224,86,74,.14);color:#f0a097;} .s-rejected .d{background:var(--red);}
+
+  .vgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;}
+  .vcard{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;}
+  .vthumb{aspect-ratio:9/16;background:linear-gradient(160deg,#1b2336,#0d1220);display:flex;align-items:center;justify-content:center;position:relative;}
+  .vthumb .play{width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.12);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;}
+  .vthumb .ov{position:absolute;top:10px;left:10px;}
+  .vbody{padding:12px 13px 14px;}
+  .vbody .t{font-size:13.5px;font-weight:700;line-height:1.3;}
+  .vbody .src{font-size:11.5px;color:var(--muted2);margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .vactions{display:flex;gap:8px;margin-top:12px;}
+  .vactions .btn.small{flex:1;text-align:center;}
+
+  .arow{display:flex;gap:16px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px;}
+  .arow .mini{width:54px;height:96px;border-radius:9px;background:linear-gradient(160deg,#1b2336,#0d1220);flex:none;}
+  .arow .info{flex:1;min-width:0;}
+  .arow .info .t{font-weight:700;font-size:14.5px;}
+  .arow .info .m{font-size:12.5px;color:var(--muted);margin-top:3px;}
+  .arow .acts{display:flex;gap:8px;flex:none;}
+
+  .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+  .chip{font-size:12.5px;font-weight:600;padding:7px 13px;border-radius:999px;background:#0e1320;border:1px solid var(--line);color:var(--muted);}
+  .chip.active{background:rgba(155,107,224,.16);border-color:rgba(155,107,224,.4);color:#fff;}
+
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .kv{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--line);font-size:14px;}
+  .flash{animation:flashbg 1.6s ease;border-radius:10px;}
+  @keyframes flashbg{0%,100%{background:transparent;}25%,60%{background:rgba(202,164,90,.22);}}
+  .kv:last-child{border-bottom:0;}
+  .kv .l{color:var(--muted);}
+  .empty{text-align:center;color:var(--muted);padding:50px 20px;border:1px dashed var(--line);border-radius:16px;}
+  .empty .big{font-size:16px;color:var(--text);font-weight:700;margin-bottom:6px;}
+
+  .avatar-pick{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:10px;margin-top:6px;}
+  .ava{border:1px solid var(--line);border-radius:12px;padding:10px 6px;text-align:center;cursor:pointer;background:#0e1320;transition:.12s;}
+  .ava:hover{border-color:var(--purple);}
+  .ava.sel{border-color:var(--purple);background:rgba(155,107,224,.12);}
+  .ava .face{width:52px;height:52px;border-radius:50%;margin:0 auto 7px;background:linear-gradient(160deg,#26314a,#161d2d);background-size:cover;background-position:center top;display:flex;align-items:center;justify-content:center;font-weight:800;color:#aeb9d0;}
+  .ava .nm{font-size:12px;font-weight:600;}
+  .ava.twin .face{background:var(--grad);color:#fff;}
+  .ava-badge{display:inline-block;font-size:8.5px;font-weight:800;letter-spacing:.03em;color:#cdb6f5;background:rgba(155,107,224,.18);border-radius:6px;padding:2px 6px;margin-top:5px;text-transform:uppercase;}
+  .ava-note{font-size:12px;color:var(--muted);margin:10px 0 0;line-height:1.5;}
+  .cap-pick{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:6px;}
+  .cap{border:1px solid var(--line);border-radius:12px;padding:11px 12px;cursor:pointer;background:#0e1320;transition:.12s;}
+  .cap:hover{border-color:var(--purple);}
+  .cap.sel{border-color:var(--purple);background:rgba(155,107,224,.12);}
+  .cap-nm{font-size:13px;font-weight:700;}
+  .cap-ds{font-size:11.5px;color:var(--muted2);margin-top:3px;}
+  .anchor{text-decoration:line-through;color:var(--muted2);font-size:14px;margin-right:7px;}
+  .founding{font-size:9px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#8fe0ad;background:rgba(78,163,107,.16);border-radius:6px;padding:3px 7px;}
+  .beta{font-size:8.5px;font-weight:800;text-transform:uppercase;color:#cdb6f5;background:rgba(155,107,224,.18);border-radius:5px;padding:2px 5px;margin-left:4px;}
+  .plan-feats{list-style:none;padding:0;margin:6px 0 0;}
+  .plan-feats li{font-size:12.5px;color:#cdd6ea;padding:3px 0 3px 18px;position:relative;line-height:1.35;}
+  .plan-feats li:before{content:'✓';position:absolute;left:0;color:var(--green);font-weight:800;}
+  .card.plan.sel{border-color:var(--purple);}
+
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:#1b2233;border:1px solid var(--line);color:var(--text);padding:13px 18px;border-radius:12px;font-size:14px;font-weight:600;box-shadow:0 16px 40px rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:.25s;z-index:100;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  .toast .ok{color:var(--green2);}
+
+  .banner{background:rgba(224,163,58,.1);border:1px solid rgba(224,163,58,.3);color:#e7c889;border-radius:12px;padding:12px 16px;font-size:13.5px;display:flex;align-items:center;gap:10px;margin-bottom:18px;}
+  .banner b{color:#fff;}
+
+  .extras{border:1px solid var(--line);border-radius:12px;padding:16px;background:#0e1320;}
+  .extras .hint{font-size:12.5px;color:var(--muted);margin-bottom:12px;}
+  .extras label{font-weight:600;}
+  input[type=file]{padding:10px;font-size:13px;}
+  input[type=file]::file-selector-button{background:#1b2233;border:1px solid var(--line);color:var(--text);border-radius:8px;padding:7px 12px;font-size:13px;margin-right:10px;cursor:pointer;}
+
+  .modal-bg{position:fixed;inset:0;background:rgba(5,8,14,.72);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;z-index:200;padding:20px;overflow-y:auto;}
+  .modal-bg.show{display:flex;}
+  .modal{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:24px;max-width:460px;width:100%;box-shadow:0 30px 80px rgba(0,0,0,.55);max-height:calc(100dvh - 32px);overflow-y:auto;}
+  /* Video review modal: video + editable caption scroll inside, action buttons stay pinned at the bottom */
+  .vmodal{padding:0;display:flex;flex-direction:column;overflow:hidden;}
+  .vmbody{overflow-y:auto;padding:14px 14px 8px;}
+  .vmacts{padding:12px 14px;border-top:1px solid var(--line);background:var(--panel);position:sticky;bottom:0;margin-top:0;flex-wrap:wrap;}
+  #vmCaption{width:100%;min-height:92px;max-height:26vh;resize:vertical;background:#0e1422;border:1px solid var(--line);border-radius:11px;color:#c9d2e6;font-family:inherit;font-size:13.5px;line-height:1.5;padding:11px 12px;outline:none;transition:border-color .12s;}
+  #vmCaption:focus{border-color:var(--brand,#9B6BE0);}
+  #vmCaption[readonly]{background:transparent;border-color:transparent;padding:0;resize:none;}
+  .modal h3{margin:0 0 6px;font-size:19px;}
+  .modal p.sub{color:var(--muted);font-size:13.5px;margin:0 0 16px;line-height:1.5;}
+  .reason-grid{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
+  .reason{font-size:13px;font-weight:600;padding:9px 13px;border-radius:999px;background:#0e1320;border:1px solid var(--line);color:var(--muted);cursor:pointer;transition:.12s;}
+  .reason:hover{border-color:var(--muted);}
+  .reason.sel{background:rgba(224,86,74,.14);border-color:rgba(224,86,74,.45);color:#f0a097;}
+  .modal-acts{display:flex;gap:10px;margin-top:8px;}
+  .modal-acts .btn{flex:1;}
+
+  /* Mobile nav: hamburger button + slide-in drawer. Hidden on desktop. */
+  .navToggle{display:none;align-items:center;justify-content:center;width:40px;height:40px;margin-right:10px;border:1px solid var(--line);border-radius:10px;background:#0e1320;color:#fff;font-size:19px;line-height:1;cursor:pointer;flex:0 0 auto;}
+  .navBackdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:65;}
+  .navBackdrop.show{display:block;}
+  @media(max-width:820px){
+    .app.show{grid-template-columns:1fr;}
+    .side{position:fixed;top:0;left:0;bottom:0;height:100vh;width:min(86vw,300px);z-index:70;transform:translateX(-102%);transition:transform .25s ease;box-shadow:0 18px 50px rgba(0,0,0,.55);overflow-y:auto;-webkit-overflow-scrolling:touch;gap:2px;padding-bottom:calc(96px + env(safe-area-inset-bottom));}
+    .side.open{transform:none;}
+    /* let the drawer grow past the viewport and scroll, instead of squashing to exactly 100vh (which hid the bottom under iOS Safari's toolbar) */
+    .side .nav{flex:0 0 auto;}
+    .side .nav a{padding:9px 12px;font-size:14px;}
+    .side .logo{padding:2px 8px 12px;}
+    .side .userbox{padding-top:10px;margin-top:6px;}
+    .navToggle{display:inline-flex;}
+    .cards3{grid-template-columns:1fr;}
+    .row2{grid-template-columns:1fr;}
+    .content{padding:20px 16px 60px;}
+    .topbar{padding:12px 14px;flex-wrap:wrap;gap:8px 6px;}
+    #pageTitle{font-size:19px;}
+    .topbar .trialbar{font-size:12px;}
+    #propSwitch{margin-right:6px;}
+  }
+  /* Phones: stack the approval card so the action buttons wrap instead of overflowing, and keep the status pill on one line */
+  @media(max-width:680px){
+    .arow{flex-wrap:wrap;align-items:flex-start;gap:12px;}
+    .arow .info{flex:1 1 calc(100% - 70px);}
+    .arow .acts{flex:1 1 100%;flex-wrap:wrap;gap:8px;margin-top:2px;}
+    .arow .acts .btn{flex:1 1 auto;min-width:104px;justify-content:center;text-align:center;}
+    .badge-status{white-space:nowrap;max-width:100%;}
+  }
+</style>
+<script src="/create.js?v=006ff9d8"></script></head>
+<body>
+
+<!-- ============ AUTH ============ -->
+<div class="auth" id="authScreen">
+  <div class="auth-card">
+    <div class="logo">
+      <svg width="30" height="30" viewBox="0 0 60 60"><defs><linearGradient id="lg" x1="0" y1="15" x2="0" y2="46" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#9B6BE0"/><stop offset="1" stop-color="#16A34A"/></linearGradient></defs>
+        <line x1="18" y1="16" x2="30" y2="43" stroke="url(#lg)" stroke-width="3.4"/><line x1="30" y1="16" x2="30" y2="43" stroke="url(#lg)" stroke-width="3.4"/><line x1="42" y1="16" x2="30" y2="43" stroke="url(#lg)" stroke-width="3.4"/>
+        <rect x="13" y="44" width="34" height="5.6" rx="2.8" fill="#16A34A"/><circle cx="18" cy="16" r="4" fill="#9B6BE0"/><circle cx="30" cy="16" r="4" fill="#9B6BE0"/><circle cx="42" cy="16" r="4" fill="#9B6BE0"/></svg>
+      <div class="wm">ALIGNED<small>WEB SERVICES</small></div>
+    </div>
+
+    <div class="trial-pill"><span class="dot"></span> 7-day free trial · no card required</div>
+    <h1 id="authTitle">Create your account</h1>
+    <p class="sub" id="authSub">Start remaking your reels into cinematic videos today.</p>
+
+    <div id="authDemo" style="display:none;margin:4px 0 18px"></div>
+
+    <div id="signupFields">
+      <div class="field"><label>Your name</label><input id="suName" autocomplete="name" placeholder="Jane Creator"/></div>
+    </div>
+    <div class="field"><label>Email</label><input id="auEmail" type="email" autocomplete="email" inputmode="email" autocapitalize="none" spellcheck="false" placeholder="you@email.com"/></div>
+    <div class="field"><label id="pwLabel">Choose a password</label><div style="position:relative"><input id="auPassword" type="password" autocomplete="current-password" placeholder="At least 6 characters" style="width:100%;padding-right:66px"/><span onclick="pwToggle('auPassword',this)" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:12px;font-weight:600;color:var(--purple);cursor:pointer;user-select:none">Show</span></div></div>
+    <div class="field" id="phoneField"><label>Mobile (we text your finished videos here)</label><input id="suPhone" type="tel" autocomplete="tel" inputmode="tel" placeholder="+1 555 123 4567"/></div>
+
+    <div id="consentFields">
+      <label style="display:flex;gap:9px;align-items:flex-start;font-size:11.5px;color:var(--muted);font-weight:500;cursor:pointer;margin-top:10px;line-height:1.5">
+        <input type="checkbox" id="suSmsConsent" style="width:auto;margin-top:2px;flex:none"/>
+        <span>I agree to receive <b>text messages</b> from Aligned Web Services about my video orders and account. Message frequency varies. Message &amp; data rates may apply. Reply STOP to opt out, HELP for help. See our <a href="https://go.alignedwebservices.ca/privacy" target="_blank" style="color:var(--purple)">Privacy Policy</a> &amp; <a href="https://go.alignedwebservices.ca/sms-terms" target="_blank" style="color:var(--purple)">SMS Terms</a>.</span>
+      </label>
+      <label style="display:flex;gap:9px;align-items:flex-start;font-size:11.5px;color:var(--muted);font-weight:500;cursor:pointer;margin-top:8px;line-height:1.5">
+        <input type="checkbox" id="suEmailConsent" style="width:auto;margin-top:2px;flex:none"/>
+        <span>I agree to receive <b>emails</b> from Aligned Web Services about my account, orders, and updates. You can unsubscribe at any time. See our <a href="https://go.alignedwebservices.ca/privacy" target="_blank" style="color:var(--purple)">Privacy Policy</a>.</span>
+      </label>
+    </div>
+
+    <button class="btn" id="authBtn" onclick="doAuth()">Start free trial →</button>
+    <div class="switch" id="authSwitch">Already have an account? <b onclick="toggleAuth()">Log in</b></div>
+    <div id="magicRow" style="text-align:center;margin-top:10px;font-size:12.5px;color:var(--muted2);display:none">Forgot your password? <b style="color:var(--purple);cursor:pointer" onclick="requestLoginLink()">Email me a login link</b></div>
+    <div style="text-align:center;margin-top:16px;font-size:11px;color:var(--muted2)"><a href="https://go.alignedwebservices.ca/privacy" target="_blank" style="color:var(--muted2)">Privacy Policy</a> · <a href="https://go.alignedwebservices.ca/sms-terms" target="_blank" style="color:var(--muted2)">SMS Terms</a> · <a href="/tos" target="_blank" style="color:var(--muted2)">Terms</a> · <a href="/refund" target="_blank" style="color:var(--muted2)">Refunds</a></div>
+  </div>
+</div>
+
+<!-- ============ APP ============ -->
+<div class="app" id="app">
+  <div class="navBackdrop" id="navBackdrop" onclick="toggleNav(false)"></div>
+  <aside class="side">
+    <div class="logo">
+      <svg width="26" height="26" viewBox="0 0 60 60"><defs><linearGradient id="lg2" x1="0" y1="15" x2="0" y2="46" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#9B6BE0"/><stop offset="1" stop-color="#16A34A"/></linearGradient></defs>
+        <line x1="18" y1="16" x2="30" y2="43" stroke="url(#lg2)" stroke-width="3.4"/><line x1="30" y1="16" x2="30" y2="43" stroke="url(#lg2)" stroke-width="3.4"/><line x1="42" y1="16" x2="30" y2="43" stroke="url(#lg2)" stroke-width="3.4"/>
+        <rect x="13" y="44" width="34" height="5.6" rx="2.8" fill="#16A34A"/><circle cx="18" cy="16" r="4" fill="#9B6BE0"/><circle cx="30" cy="16" r="4" fill="#9B6BE0"/><circle cx="42" cy="16" r="4" fill="#9B6BE0"/></svg>
+      <div class="wm">ALIGNED<small>WEB SERVICES</small></div>
+    </div>
+    <nav class="nav" id="nav">
+      <a data-view="home" class="active" onclick="go('home')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10l9-7 9 7v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg> Dashboard</a>
+      
+      
+      <a onclick="openTwinStudio()" style="cursor:pointer"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 10l4.55-2.28A1 1 0 0 1 21 8.62v6.76a1 1 0 0 1-1.45.9L15 14M5 6h9a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z"/></svg> Avatar videos</a>
+      <a data-view="remake" onclick="go('remake')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15V3m0 12l-4-4m4 4l4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg> Other videos</a>
+      <a data-view="socials" onclick="goSocials()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> Connect socials</a>
+      <a data-view="ugc" onclick="go('ugc')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg> UGC Ads</a>
+      <a data-view="library" onclick="go('library')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg> Library</a>
+      <a data-view="approvals" onclick="go('approvals')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg> Approvals <span class="badge hidden" id="apvBadge">0</span></a>
+      <a data-view="brandkit" onclick="go('brandkit')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="10.5" r="2.5"/><circle cx="8.5" cy="7.5" r="2.5"/><circle cx="6.5" cy="12.5" r="2.5"/><path d="M12 2a10 10 0 1 0 0 20c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.3-.3-.4-.5-.8-.5-1.2 0-1.1.9-2 2-2h2.5a4.5 4.5 0 0 0 4.5-4.5C22 6.5 17.5 2 12 2z"/></svg> Brand kit</a>
+      <a data-view="tutorials" onclick="go('tutorials')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> Tutorials</a>
+      <a data-view="account" onclick="go('account')"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 12 0v1"/></svg> Account &amp; billing</a>
+      <a data-view="support" onclick="asstOpen(true)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Support</a>
+    </nav>
+    <style>
+      .userbox{position:relative;display:flex;align-items:center;gap:10px}
+      .acct-caret{color:var(--muted2);flex:none;transition:transform .15s ease}
+      .acct-menu{position:absolute;bottom:calc(100% + 8px);left:0;right:0;background:var(--panel2,#0e1320);border:1px solid var(--line);border-radius:12px;box-shadow:0 -10px 34px rgba(0,0,0,.55);padding:6px;z-index:1600;max-height:64vh;overflow:auto}
+      .acct-item{display:flex;align-items:center;gap:9px;padding:8px;border-radius:9px;cursor:pointer}
+      .acct-item:hover{background:rgba(255,255,255,.06)}
+      .acct-item.active{background:rgba(124,92,255,.16)}
+      .ai-dot{width:28px;height:28px;border-radius:8px;background:var(--grad);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px;flex:none}
+      .ai-tx{flex:1;min-width:0}.ai-nm{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ai-em{font-size:11px;color:var(--muted2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+      .ai-chk{color:var(--purple);font-weight:700;flex:none}
+      .acct-add{padding:10px 8px;border-radius:9px;cursor:pointer;font-size:13px;color:var(--purple);font-weight:600;border-top:1px solid var(--line);margin-top:4px}
+      .acct-add:hover{background:rgba(124,92,255,.12)}
+      .acct-out{padding:9px 8px;border-radius:9px;cursor:pointer;font-size:12.5px;color:var(--muted)}
+      .acct-out:hover{background:rgba(255,255,255,.06);color:var(--text)}
+      .side-tools{display:flex;flex-direction:column;gap:2px;margin-top:8px;padding-top:8px;border-top:1px solid var(--line)}
+      .side-tool{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:10px;background:transparent;border:0;color:var(--muted);font-size:13px;font-weight:600;text-align:left;width:100%}
+      .side-tool:hover{background:#161c2a;color:var(--text)}
+      html[data-theme="light"] .side-tool:hover{background:#EEF1F8}
+      .side-tool svg{flex:none;opacity:.9}
+    </style>
+    <div class="userbox" onclick="toggleAcctMenu(event)" style="cursor:pointer" title="Switch account">
+      <div class="avatar-dot" id="userInitial">A</div>
+      <div style="flex:1;min-width:0"><div class="nm" id="userName">-</div><div class="em" id="userEmail">-</div></div>
+      <svg class="acct-caret" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="18 15 12 9 6 15"></polyline></svg>
+      <div id="acctMenu" class="acct-menu" style="display:none"></div>
+    </div>
+    <div class="side-tools">
+      <button class="side-tool" onclick="openFeedback()" title="Suggest a feature">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.1V17h6v-.2c0-.8.4-1.6 1-2.1A7 7 0 0 0 12 2z"/></svg>
+        Suggest a feature
+      </button>
+      <button class="side-tool" onclick="toggleTheme()" title="Switch light or dark mode">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        <span id="themeLabel">Light mode</span>
+      </button>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <button class="navToggle" onclick="toggleNav()" aria-label="Open menu">☰</button>
+      <h2 id="pageTitle">Dashboard</h2>
+      <div class="spacer"></div>
+      <div id="propSwitch" style="display:none;gap:3px;background:#0e1320;border:1px solid var(--line);border-radius:10px;padding:3px;margin-right:12px" title="Switch between your Aligned tools">
+        <a href="https://alignedwebservices.ca" style="padding:5px 12px;border-radius:7px;font-size:13px;color:var(--muted);text-decoration:none">Builder</a>
+        <a style="padding:5px 12px;border-radius:7px;font-size:13px;background:#7c5cff;color:#fff;text-decoration:none;font-weight:700">App</a>
+        <a href="https://crm.alignedwebservices.ca" id="crmLink" onclick="return openCRM(event)" style="padding:5px 12px;border-radius:7px;font-size:13px;color:var(--muted);text-decoration:none">CRM</a>
+      </div>
+      <button class="help-btn" onclick="asstOpen(true)" title="Get help from your Aligned Assistant">?</button>
+      <div class="trialbar" id="trialbar"><span>⏳</span> <span id="trialText">Trial</span> · <b style="cursor:pointer" onclick="go('account')">Upgrade</b></div>
+    </div>
+    <div class="content" id="content"></div>
+    <footer style="text-align:center;padding:22px 20px;font-size:11.5px;color:var(--muted2);border-top:1px solid var(--line);margin-top:24px">Aligned Web Services · <a href="https://go.alignedwebservices.ca/privacy" target="_blank" style="color:var(--muted2)">Privacy Policy</a> · <a href="https://go.alignedwebservices.ca/sms-terms" target="_blank" style="color:var(--muted2)">SMS Terms</a> · <a href="/tos" target="_blank" style="color:var(--muted2)">Terms</a> · <a href="/refund" target="_blank" style="color:var(--muted2)">Refunds</a></footer>
+  </div>
+</div>
+
+<!-- reject feedback modal -->
+<div class="modal-bg" id="rejectModal">
+  <div class="modal">
+    <h3>What missed the mark?</h3>
+    <p class="sub">Your feedback trains the engine - the next version comes back closer to what you want.</p>
+    <div class="reason-grid" id="reasonGrid"></div>
+    <div class="field"><label>Anything else? <span style="color:var(--muted2);font-weight:500">(optional)</span></label><textarea id="rejectNote" placeholder="Tell us more…" style="min-height:62px"></textarea></div>
+    <div class="modal-acts">
+      <button class="btn ghost" onclick="closeReject()">Cancel</button>
+      <button class="btn danger" style="border-color:#5a2f37" onclick="confirmReject()">Submit &amp; reject</button>
+    </div>
+  </div>
+</div>
+
+<!-- suggest-a-feature (feedback) modal -->
+<div class="modal-bg" id="feedbackModal">
+  <div class="modal" style="max-width:440px">
+    <h3>Suggest a feature</h3>
+    <p class="sub">Tell us what would make Aligned better for you. We read every suggestion.</p>
+    <div class="field"><label>Short title <span style="color:var(--muted2);font-weight:500">(optional)</span></label><input id="fbTitle" placeholder="e.g. Bulk-approve my videos"/></div>
+    <div class="field"><label>What feature would make Aligned better for you?</label><textarea id="fbMessage" placeholder="Describe the feature or the problem you'd love us to solve…" style="min-height:110px"></textarea></div>
+    <div class="modal-acts">
+      <button class="btn ghost" onclick="closeFeedback()">Cancel</button>
+      <button class="btn" id="fbSendBtn" onclick="sendFeedback()">Send suggestion</button>
+    </div>
+  </div>
+</div>
+
+<!-- avatar library modal -->
+<div class="modal-bg" id="avaLibModal">
+  <div class="modal" style="max-width:680px;max-height:84vh;display:flex;flex-direction:column">
+    <h3 style="margin:0 0 4px" id="avaLibTitle">Avatar library</h3>
+    <p class="sub" style="margin:0 0 12px" id="avaLibSub">Tap a presenter to use it - it'll be added to your favourites so it's one tap next time. Tap ☆ to favourite without selecting, or tap the looks badge to see their other outfits and settings.</p>
+    <div id="avaLibBrowse" style="display:flex;flex-direction:column;min-height:0;flex:1">
+      <input id="avaLibSearch" oninput="avaLibSearch(this.value)" placeholder="🔍 Search presenters by name…" style="margin-bottom:10px;flex:none"/>
+      <div class="filters" id="avaLibFilters" style="margin:0 0 10px;flex:none">
+        <span class="chip active" data-g="" onclick="avaLibGender(this)">All</span>
+        <span class="chip" data-g="female" onclick="avaLibGender(this)">Women</span>
+        <span class="chip" data-g="male" onclick="avaLibGender(this)">Men</span>
+        <span class="chip" data-g="fav" onclick="avaLibGender(this)">★ Favourites</span>
+      </div>
+      <div class="avatar-pick" id="avaLibGrid" style="overflow:auto;margin-top:0;padding-right:4px"></div>
+    </div>
+    <div id="avaLibLooks" style="display:none;flex-direction:column;min-height:0;flex:1">
+      <div class="avatar-pick" id="avaLibLooksGrid" style="overflow:auto;margin-top:0;padding-right:4px"></div>
+    </div>
+    <div class="modal-acts" style="margin-top:14px;flex:none">
+      <button class="btn ghost" id="avaLibBack" onclick="closeLooks()" style="display:none">← All presenters</button>
+      <button class="btn ghost" onclick="closeAvaLib()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- connect social modal -->
+<div class="modal-bg" id="connectModal">
+  <div class="modal">
+    <h3 id="connectTitle">Connect Instagram</h3>
+    <p class="sub">To post for you, we need your permission. Here's exactly what happens:</p>
+    <ol style="color:var(--muted);font-size:13.5px;line-height:1.7;margin:0 0 14px;padding-left:18px">
+      <li>You authorize us below.</li>
+      <li>We <b style="color:#fff">text and email you a secure link</b>. Tap it, then connect your accounts - you approve on the platform's <b style="color:#fff">own page</b>, and <b style="color:#fff">we never see your password</b>.</li>
+      <li>Once it's <b style="color:#fff">connected</b>, we post your approved videos automatically.</li>
+    </ol>
+    <label style="display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--text);font-weight:500;cursor:pointer;background:#0e1320;border:1px solid var(--line);border-radius:12px;padding:13px;line-height:1.5">
+      <input type="checkbox" id="connectConsent" style="width:auto;margin-top:2px;flex:none"/>
+      <span>I authorize Aligned Web Services to access and post to my <b id="connectPlatform">Instagram</b> account on my behalf. I understand I can revoke this access at any time.</span>
+    </label>
+    <div class="modal-acts" style="margin-top:14px">
+      <button class="btn ghost" onclick="closeConnect()">Cancel</button>
+      <button class="btn" onclick="confirmConnect()">Request connection</button>
+    </div>
+    <div id="connectCreate" style="text-align:center;margin-top:13px;font-size:12.5px;color:var(--muted2)"></div>
+  </div>
+</div>
+
+<div class="modal-bg" id="proAcctModal" style="z-index:400">
+  <div class="modal" style="max-width:540px;max-height:88vh;overflow:auto">
+    <h3>First: make your Instagram a Professional account</h3>
+    <p class="sub">Instagram only allows automation and posting on <b>Professional</b> accounts (Business or Creator). This is required before we connect your account here or run Social Autopilot. It's free, takes about 2 minutes, and you can switch back any time.</p>
+    <ol style="color:var(--muted);font-size:13.5px;line-height:1.9;margin:0 0 14px;padding-left:18px">
+      <li>Open the <b style="color:#fff">Instagram app</b>, go to your profile, and tap the <b style="color:#fff">menu (☰)</b> → <b style="color:#fff">Settings and privacy</b>.</li>
+      <li>Find <b style="color:#fff">Account type and tools</b> (sometimes shown under "For professionals"), then tap <b style="color:#fff">Switch to professional account</b>.</li>
+      <li>Choose a category, then pick <b style="color:#fff">Business</b> (best for most local businesses) or <b style="color:#fff">Creator</b>, and tap <b style="color:#fff">Next</b>.</li>
+      <li>When prompted, <b style="color:#fff">connect your Facebook Page</b> - this is needed for full automation. No Page yet? Create a free one first; Instagram's business tools connect through it.</li>
+    </ol>
+    <p style="font-size:12.5px;color:var(--muted2);margin:0 0 12px">Official Instagram guide: <a class="link" style="color:var(--purple)" href="https://help.instagram.com/502981923235522" target="_blank" rel="noopener">help.instagram.com</a></p>
+    <div class="modal-acts" style="margin-top:4px">
+      <button class="btn" onclick="closeProModal()">Got it</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="autopilotModal">
+  <div class="modal" style="max-width:560px;max-height:90vh;overflow:auto">
+    <h3>Set up Social Autopilot</h3>
+    <p class="sub">We reply to your DMs, respond to comments, and grow your following - hands-free. Tell us a bit and we'll get you live.</p>
+    <div style="background:#0e1320;border:1px solid var(--line);border-radius:12px;padding:12px 13px;margin:0 0 14px;font-size:13px;color:var(--text);display:flex;gap:11px;align-items:flex-start">
+      <span onclick="openProModal()" title="How to switch to a Professional account" style="flex:none;display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;border:1.6px solid var(--purple);color:var(--purple);font-size:13px;font-weight:700;font-style:italic;font-family:Georgia,serif;cursor:pointer">i</span>
+      <span>Your Instagram must be a <b>Professional</b> account (Business or Creator) first. <a class="link" style="color:var(--purple);cursor:pointer" onclick="openProModal()">Show me how &rarr;</a></span>
+    </div>
+    <div class="field"><label>Instagram handle</label><input id="apHandle" placeholder="@yourbusiness"/></div>
+    <div class="field"><label>Facebook Page (Instagram connects through it)</label><input id="apFb" placeholder="facebook.com/yourpage or the page name"/></div>
+    <div class="field"><label>3–5 competitor / lookalike accounts to model</label><textarea id="apTargets" placeholder="@competitor1, @competitor2, @localbiz3 - accounts whose followers are your ideal customer"></textarea></div>
+    <div class="field"><label>Who's your ideal customer, and what's the goal?</label><textarea id="apGoals" placeholder="e.g. homeowners in Kelowna who need landscaping - goal is booked consults"></textarea></div>
+    <div class="field"><label>Anything we should NOT say or do? (optional)</label><textarea id="apAvoid" placeholder="e.g. don't quote pricing in DMs, avoid political topics"></textarea></div>
+    <div class="modal-acts" style="margin-top:8px">
+      <button class="btn ghost" onclick="closeAutopilot()">Cancel</button>
+      <button class="btn" onclick="submitAutopilot()">Activate autopilot &rarr;</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="/core.config.js?v=db33374a"></script>
+<script src="/core.state.js?v=98fbe5bb"></script>
+<script src="/core.auth.js?v=bc80d511"></script>
+<script src="/core.session.js?v=4703cf83"></script>
+<script src="/core.router.js?v=ae81abb7"></script>
+<script src="/core.screens.js?v=56e4af56"></script>
+<script src="/core.twin.picker.js?v=e68242e7"></script>
+<script src="/core.twin.studio.js?v=60de6d33"></script>
+<script src="/core.twin.record.js?v=c3988a39"></script>
+<script src="/core.video.js?v=33bc2099"></script>
+<script src="/core.account.js?v=38cb4184"></script>
+<script src="/core.boot.js?v=2cdac67f"></script>
+
+<!-- ===== Content Strategist chat widget ===== -->
+<style>
+  .cw-bubble{position:fixed;right:22px;bottom:22px;width:58px;height:58px;border-radius:50%;background:var(--grad);display:none;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 10px 28px rgba(0,0,0,.45);z-index:1400;border:0}
+  .cw-bubble.show{display:flex}
+  .cw-bubble svg{width:26px;height:26px;color:#fff}
+  .cw-teaser{position:fixed;right:92px;bottom:28px;max-width:248px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 15px;font-size:13px;color:var(--text);box-shadow:0 12px 30px rgba(0,0,0,.5);z-index:1399;cursor:pointer;display:none;line-height:1.45}
+  .cw-teaser.show{display:block}
+  .cw-teaser b{color:var(--purple)}
+  .cw-teaser .cwx{position:absolute;top:-9px;right:-9px;width:21px;height:21px;border-radius:50%;background:var(--panel2);border:1px solid var(--line);color:var(--muted);font-size:11px;display:flex;align-items:center;justify-content:center;cursor:pointer;line-height:1}
+  .cw-panel{position:fixed;right:22px;bottom:22px;width:384px;max-width:calc(100vw - 24px);height:580px;max-height:calc(100vh - 36px);background:var(--panel);border:1px solid var(--line);border-radius:18px;display:none;flex-direction:column;overflow:hidden;z-index:1401;box-shadow:0 18px 60px rgba(0,0,0,.55)}
+  .cw-panel.show{display:flex}
+  .cw-head{display:flex;align-items:center;gap:11px;padding:13px 15px;border-bottom:1px solid var(--line);background:var(--panel2)}
+  .cw-head .av{width:30px;height:30px;border-radius:9px;background:var(--grad);flex:none}
+  .cw-head .t{font-weight:700;font-size:13.5px}.cw-head .s{font-size:11px;color:var(--muted2)}
+  .cw-x{margin-left:auto;cursor:pointer;color:var(--muted);font-size:17px;background:none;border:0;line-height:1}
+  .cw-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px}
+  .cw-msg{max-width:86%;padding:10px 12px;border-radius:13px;font-size:13.5px;line-height:1.55;white-space:pre-wrap;word-wrap:break-word}
+  .cw-msg.bot{background:var(--panel2);border:1px solid var(--line);align-self:flex-start;border-bottom-left-radius:4px}
+  .cw-msg.me{background:rgba(155,107,224,.18);border:1px solid rgba(155,107,224,.32);align-self:flex-end;border-bottom-right-radius:4px}
+  .cw-typing{align-self:flex-start;color:var(--muted2);font-size:12px;padding:2px 12px}
+  .cw-acts{align-self:flex-start;display:flex;gap:8px;flex-wrap:wrap}
+  .cw-pill{background:var(--grad);color:#fff;border:0;border-radius:10px;padding:11px 14px;font-size:12.5px;font-weight:700;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:rgba(124,92,255,.3)}
+  .cw-pill.ghost{background:transparent;border:1px solid var(--line);color:var(--text)}
+  .cw-foot{padding:11px;border-top:1px solid var(--line);display:flex;gap:8px;align-items:center;position:relative}
+  .cw-plus{flex:none;width:40px;height:40px;border-radius:10px;background:var(--panel2);border:1px solid var(--line);color:var(--text);font-size:22px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;touch-action:manipulation}
+  .cw-plus:active{background:rgba(124,92,255,.15)}
+  .cw-pluspop{position:absolute;left:11px;bottom:58px;background:var(--panel);border:1px solid var(--line);border-radius:13px;box-shadow:0 14px 36px rgba(0,0,0,.55);padding:6px;display:none;flex-direction:column;gap:2px;z-index:20;min-width:210px}
+  .cw-pluspop.show{display:flex}
+  .cw-pluspop button{display:flex;align-items:center;gap:9px;background:none;border:0;color:var(--text);font-size:13.5px;font-weight:600;text-align:left;padding:11px 12px;border-radius:9px;cursor:pointer;font-family:inherit;touch-action:manipulation}
+  .cw-pluspop button:active{background:rgba(124,92,255,.16)}
+  .cw-foot input{flex:1;background:var(--panel2);border:1px solid var(--line);border-radius:10px;color:var(--text);padding:10px;font-size:13.5px;font-family:inherit}
+  .cw-foot input:focus{outline:none;border-color:var(--purple)}
+  .cw-send{background:var(--grad);border:0;border-radius:10px;color:#fff;font-weight:800;padding:0 15px;cursor:pointer;font-size:16px}
+  .plan-day{border:1px solid var(--line);border-radius:12px;padding:12px 13px;margin-bottom:9px;background:var(--panel2)}
+  .plan-day .ph{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+  .plan-day .dn{font-weight:800;font-size:12px;color:var(--muted)}
+  .plan-day .stg{font-size:9px;font-weight:800;letter-spacing:.04em;border-radius:5px;padding:2px 6px}
+  .stg.TOFU{color:#8fe0ad;background:rgba(78,163,107,.16)} .stg.MOFU{color:#cdb6f5;background:rgba(155,107,224,.18)} .stg.BOFU{color:#f0c987;background:rgba(224,163,58,.18)}
+  .plan-day .hk{font-weight:700;font-size:13px;margin-bottom:3px} .plan-day .sc{font-size:12px;color:#cdd6ea;margin-bottom:4px} .plan-day .cp{font-size:11.5px;color:var(--muted2)}
+  .plan-day [contenteditable]{outline:none;border-radius:6px;padding:2px 4px;margin:0 -4px;transition:.12s}
+  .plan-day [contenteditable]:hover{background:rgba(255,255,255,.03)}
+  .plan-day [contenteditable]:focus{background:rgba(124,92,255,.10);box-shadow:0 0 0 1px var(--purple)}
+</style>
+<button class="cw-bubble" id="cwBubble" onclick="cwToggle(true)" aria-label="Open content strategist"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></button>
+<div class="cw-teaser" id="cwTeaser" onclick="cwToggle(true)"><span class="cwx" role="button" aria-label="Dismiss" onclick="event.stopPropagation();cwDismissTeaser()">✕</span>Any questions? Let's build your next <b>30 days of content!</b></div>
+<div class="cw-panel" id="cwPanel">
+  <div class="cw-head"><svg width="30" height="30" viewBox="0 0 60 60" style="flex:none"><defs><linearGradient id="cwlg" x1="0" y1="15" x2="0" y2="46" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#9B6BE0"/><stop offset="1" stop-color="#16A34A"/></linearGradient></defs><line x1="18" y1="16" x2="30" y2="43" stroke="url(#cwlg)" stroke-width="3.4"/><line x1="30" y1="16" x2="30" y2="43" stroke="url(#cwlg)" stroke-width="3.4"/><line x1="42" y1="16" x2="30" y2="43" stroke="url(#cwlg)" stroke-width="3.4"/><rect x="13" y="44" width="34" height="5.6" rx="2.8" fill="#16A34A"/><circle cx="18" cy="16" r="4" fill="#9B6BE0"/><circle cx="30" cy="16" r="4" fill="#9B6BE0"/><circle cx="42" cy="16" r="4" fill="#9B6BE0"/></svg><div><div class="t">Content Strategist</div><div class="s">Plan &amp; auto-create your content</div></div><button class="cw-x" aria-label="Close content strategist" onclick="cwToggle(false)">✕</button></div>
+  <div class="cw-msgs" id="cwMsgs"></div>
+  <input id="cwKnowFile" type="file" accept=".txt,.md,.markdown,.csv,.html,.htm,.json,.rtf,.pdf" style="display:none" onchange="cwKnowFileChosen(this)"/>
+  <div class="cw-pluspop" id="cwPlusPop">
+    <button type="button" onclick="cwPlusPick('web')">🔗 Add my website</button>
+    <button type="button" onclick="cwPlusPick('file')">📎 Upload a file</button>
+    <button type="button" onclick="cwPlusPick('none')">🌐 I don't have a website</button>
+  </div>
+  <div class="cw-foot"><button class="cw-plus" id="cwPlus" type="button" onclick="cwPlusToggle(event)" aria-label="Add website or file">+</button><input id="cwInput" placeholder="Any questions? Let's build your next 30 days…"/><button class="cw-send" onclick="cwSend()">→</button></div>
+</div>
+<div class="modal-bg" id="planModal"><div class="modal" style="max-width:580px;max-height:82vh;overflow:auto">
+  <h3>Your 30-day content plan</h3>
+  <p class="sub" id="planSub">A full month of hooks, scripts and captions across your funnel. <b style="color:var(--purple)">Tap any line to edit it</b>, then Save changes.</p>
+  <div class="field" style="margin:2px 0 14px;background:var(--panel2);border:1px solid var(--line);border-radius:11px;padding:11px 12px">
+    <label style="font-size:12.5px;color:var(--text);font-weight:600">🎬 Default look for your daily videos</label>
+    <div id="planAvatarWrap" data-avwrap style="margin-top:7px;display:flex;gap:6px;flex-wrap:wrap;align-items:center"></div>
+    <div style="font-size:11.5px;color:var(--muted2);margin-top:6px">This is the look used unless you change a specific day. <b style="color:var(--purple)">Each day below has its own look picker</b> - mix it up for a pattern interrupt.</div>
+  </div>
+  <div class="field" style="margin:2px 0 14px;background:var(--panel2);border:1px solid var(--line);border-radius:11px;padding:11px 12px">
+    <label style="font-size:12.5px;color:var(--text);font-weight:600">🎥 Default video style</label>
+    <div style="margin-top:7px">
+      <select id="planStyleSel" onchange="onPlanStyleChange()" style="font-size:12.5px;padding:6px 8px;max-width:240px"><option value="avatar">Avatar - on-camera presenter</option><option value="faceless">Faceless - B-roll + voiceover</option><option value="cinematic">Cinematic - your twin in an AI scene</option><option value="reel">Cinematic reel - scroll-stopping motion graphics</option></select>
+    </div>
+    <div style="font-size:11.5px;color:var(--muted2);margin-top:6px">Faceless plays your script as a voiceover over B-roll instead of an on-camera presenter. <b style="color:var(--purple)">Each day below can be switched too.</b></div>
+    <div id="brollLibWrap" style="margin-top:10px;display:block;border-top:1px solid var(--line);padding-top:10px">
+      <label style="font-size:12px;color:var(--text);font-weight:600">Your B-roll library <span style="color:var(--muted2);font-weight:500">(optional)</span></label>
+      <div style="font-size:11.5px;color:var(--muted2);margin:4px 0 7px">Upload a few vertical clips of your real work. We play them behind your faceless videos, and behind you in showcase videos. Leave this empty and we'll auto-source matching stock footage instead.</div>
+      <input id="brollLibInput" type="file" accept="video/*" multiple onchange="uploadBrollLib(this)" style="font-size:12px">
+      <div id="brollLibStatus" style="font-size:11.5px;color:var(--purple);margin-top:6px"></div>
+      <div id="brollLibList" style="margin-top:7px;display:flex;flex-wrap:wrap;gap:6px"></div>
+    </div>
+  </div>
+  <div id="planList"></div>
+  <div id="planCostBox" style="font-size:12px;color:var(--muted2);margin-top:8px;background:var(--panel2);border:1px solid var(--line);border-radius:11px;padding:11px"></div>
+  <div style="font-size:12.5px;color:var(--muted2);margin-top:6px;background:var(--panel2);border:1px solid var(--line);border-radius:11px;padding:11px">Each day's reel is rendered automatically and sent to your <b>Approvals</b> for a quick yes before it posts - you stay in control of everything that goes out.</div>
+  <div class="modal-acts" style="margin-top:14px;position:sticky;bottom:0;background:var(--panel);padding-top:10px">
+    <button class="btn ghost" onclick="document.getElementById('planModal').classList.remove('show')">Close</button>
+    <button class="btn ghost" onclick="savePlanEdits(this)">Save changes</button>
+    <button class="btn" onclick="cwStartDaily()">Start daily auto-render</button>
+  </div>
+</div></div>
+
+<!-- my plans (switcher) modal -->
+<div class="modal-bg" id="plansModal"><div class="modal" style="max-width:520px;max-height:80vh;overflow:auto">
+  <h3>My content plans</h3>
+  <p class="sub">Keep as many 30-day plans as you like - open one to view or run it. Only one runs daily renders at a time.</p>
+  <div id="plansList"></div>
+  <div class="modal-acts" style="margin-top:14px">
+    <button class="btn ghost" onclick="closePlans()">Close</button>
+  </div>
+</div></div>
+
+<!-- inline video player + review modal -->
+<div class="modal-bg" id="videoModal"><div class="modal vmodal" style="max-width:440px">
+  <div class="vmbody">
+    <video id="vmPlayer" controls playsinline preload="metadata" style="width:100%;border-radius:13px;background:#000;max-height:46vh;display:block"></video>
+    <div id="vmTitle" style="font-weight:800;font-size:16px;margin:12px 0 4px"></div>
+    <div id="vmCapLabel" style="display:none;font-size:12px;color:#9aa6bf;margin:6px 0 5px">Caption <span style="opacity:.7">· edit it here before posting</span> <span id="vmCapSaved" style="color:#5fd08a;opacity:0;transition:opacity .2s;margin-left:4px">Saved ✓</span></div>
+    <textarea id="vmCaption" readonly></textarea>
+  </div>
+  <div id="vmActs" class="modal-acts vmacts"></div>
+</div></div>
+<script src="/cw.js?v=eb6a0114"></script>
+<!-- UGC Ads screen -->
+<script src="/ugc.js?v=fda704f8"></script>
+
+<!-- ===== Aligned Assistant (support + build concierge) ===== -->
+<style>
+  .asst-panel{position:fixed;right:22px;bottom:22px;width:390px;max-width:calc(100vw - 24px);height:600px;max-height:calc(100vh - 36px);background:var(--panel);border:1px solid var(--line);border-radius:18px;display:none;flex-direction:column;overflow:hidden;z-index:1600;box-shadow:0 18px 60px rgba(0,0,0,.55)}
+  .asst-panel.show{display:flex}
+  .asst-head{display:flex;align-items:center;gap:11px;padding:13px 15px;border-bottom:1px solid var(--line);background:var(--panel2)}
+  .asst-head .av{width:30px;height:30px;border-radius:9px;background:var(--grad);flex:none}
+  .asst-head .t{font-weight:700;font-size:13.5px}.asst-head .s{font-size:11px;color:var(--muted2)}
+  .asst-x{margin-left:auto;cursor:pointer;color:var(--muted);font-size:17px;background:none;border:0;line-height:1}
+  .asst-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px}
+  .asst-msg{max-width:86%;padding:10px 12px;border-radius:13px;font-size:13.5px;line-height:1.55;white-space:pre-wrap;word-wrap:break-word}
+  .asst-msg.bot{background:var(--panel2);border:1px solid var(--line);align-self:flex-start;border-bottom-left-radius:4px}
+  .asst-msg.me{background:rgba(155,107,224,.18);border:1px solid rgba(155,107,224,.32);align-self:flex-end;border-bottom-right-radius:4px}
+  .asst-typing{align-self:flex-start;color:var(--muted2);font-size:12px;padding:2px 12px}
+  .asst-foot{padding:11px;border-top:1px solid var(--line);display:flex;gap:8px;align-items:center}
+  .asst-foot input{flex:1;background:var(--panel2);border:1px solid var(--line);border-radius:10px;color:var(--text);padding:10px;font-size:13.5px;font-family:inherit}
+  .asst-foot input:focus{outline:none;border-color:var(--purple)}
+  .asst-send{background:var(--grad);border:0;border-radius:10px;color:#fff;font-weight:800;padding:0 15px;cursor:pointer;font-size:16px}
+  .topbar .help-btn{width:34px;height:34px;border-radius:9px;background:var(--panel2);border:1px solid var(--line);color:var(--text);font-size:16px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;margin-right:12px;flex:none}
+  .topbar .help-btn:hover{border-color:var(--purple);color:var(--purple)}
+</style>
+<div class="asst-panel" id="asstPanel">
+  <div class="asst-head"><div class="av"></div><div><div class="t">Aligned Assistant</div><div class="s">Here to help - and to build</div></div><button class="asst-x" onclick="asstOpen(false)" aria-label="Close">✕</button></div>
+  <div class="asst-msgs" id="asstMsgs"></div>
+  <div class="asst-foot"><input id="asstInput" placeholder="Ask me anything, or tell me what to build…" onkeydown="if(event.key==='Enter')asstSend()"/><button class="asst-send" onclick="asstSend()">→</button></div>
+</div>
+<script src="/assistant.js?v=270da900"></script>
+</body>
+</html>
