@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aligned - Support Lookup</title>
+<meta name="robots" content="noindex,nofollow">
+<style>
+  :root{--bg:#0B0E14;--panel:#141925;--panel2:#10141f;--line:#222b3d;--text:#EAF1F8;--muted:#8b93a7;--muted2:#69728a;--purple:#9B6BE0;--green:#16A34A;--amber:#E0A33A;--red:#E0564A;--grad:linear-gradient(135deg,#9B6BE0,#16A34A)}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+  .wrap{max-width:760px;margin:0 auto;padding:26px 18px 60px}
+  h1{font-size:20px;margin:0 0 2px;font-weight:800}
+  .sub{color:var(--muted);font-size:13px;margin:0 0 20px}
+  label{display:block;font-size:12px;color:var(--muted);margin:0 0 6px;font-weight:600}
+  input{width:100%;background:#0e1320;border:1px solid var(--line);color:var(--text);border-radius:11px;padding:12px;font-size:15px;outline:none}
+  input:focus{border-color:var(--purple)}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:14px}
+  .row .field{flex:1;min-width:200px}
+  .btn{border:0;border-radius:11px;padding:12px 20px;font-weight:700;color:#fff;background:var(--grad);cursor:pointer;font-size:14px;white-space:nowrap}
+  .btn.ghost{background:#0e1320;border:1px solid var(--line);color:var(--text)}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px;margin-top:16px}
+  .flag{background:rgba(224,86,74,.12);border:1px solid rgba(224,86,74,.4);color:#ffb4ad;border-radius:10px;padding:11px 13px;font-size:13.5px;margin-bottom:8px;display:flex;gap:8px;align-items:flex-start}
+  .ok{background:rgba(22,163,74,.12);border:1px solid rgba(22,163,74,.4);color:#9be8b4;border-radius:10px;padding:11px 13px;font-size:13.5px}
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:6px}
+  .kv{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:11px 13px}
+  .kv .k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+  .kv .v{font-size:16px;font-weight:700;margin-top:3px;word-break:break-word}
+  .big{font-size:26px}
+  .pill{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;margin-left:6px}
+  .pill.green{background:rgba(22,163,74,.2);color:#9be8b4}
+  .pill.amber{background:rgba(224,163,58,.2);color:#f0d08a}
+  .pill.red{background:rgba(224,86,74,.2);color:#ffb4ad}
+  h3{font-size:14px;margin:18px 0 8px;color:var(--muted)}
+  details{margin-top:14px}
+  summary{cursor:pointer;color:var(--muted);font-size:13px}
+  pre{background:#0a0d14;border:1px solid var(--line);border-radius:10px;padding:12px;overflow:auto;font-size:12px;color:#cdd6e6;max-height:340px}
+  .muted{color:var(--muted);font-size:13px}
+  .err{color:#ffb4ad;font-size:13.5px;margin-top:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Aligned - Support Lookup</h1>
+  <p class="sub">Look up any customer to see their account health, plan status, and what might be blocking them.</p>
+
+  <div class="field" style="margin-bottom:12px">
+    <label>Admin key</label>
+    <input id="key" type="password" placeholder="Paste your admin key" autocomplete="off">
+  </div>
+  <div class="row">
+    <div class="field">
+      <label>Customer email</label>
+      <input id="email" type="email" placeholder="customer@email.com" autocomplete="off" onkeydown="if(event.key==='Enter')lookup()">
+    </div>
+    <button class="btn" onclick="lookup()">Look up</button>
+    <button class="btn ghost" onclick="listAll()">List all</button>
+  </div>
+
+  <div id="result"></div>
+</div>
+
+<script>
+const BASE='https://alignedwebservices.app.n8n.cloud/webhook';
+function key(){ return (document.getElementById('key').value||'').trim(); }
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function post(path,body){ return fetch(BASE+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(r=>r.json()); }
+
+function statusPill(s){
+  if(s==='active') return '<span class="pill green">active</span>';
+  if(s==='trialing') return '<span class="pill amber">trialing</span>';
+  if(s==='cancelled') return '<span class="pill red">cancelled</span>';
+  return '<span class="pill amber">'+esc(s||'-')+'</span>';
+}
+
+async function lookup(){
+  const k=key(), email=(document.getElementById('email').value||'').trim();
+  const R=document.getElementById('result');
+  if(!k){ R.innerHTML='<div class="err">Enter your admin key first.</div>'; return; }
+  if(!email){ R.innerHTML='<div class="err">Enter a customer email.</div>'; return; }
+  R.innerHTML='<p class="muted">Looking up…</p>';
+  let acc, plan, bal;
+  try{ acc=await post('/admin-account',{key:k,email}); }catch(e){ R.innerHTML='<div class="err">Couldn’t reach the server.</div>'; return; }
+  if(acc && acc.error){ R.innerHTML='<div class="err">'+esc(acc.error==='unauthorized'?'That admin key is not valid.':acc.error)+'</div>'; return; }
+  try{ plan=await post('/admin-plan',{key:k,email}); }catch(e){ plan={found:false}; }
+  // the REAL spendable balance is computed server-side (monthly grant - used this month + top-ups)
+  try{ bal=await post('/credit-balance',{email}); }catch(e){ bal=null; }
+
+  if(!acc.found){ R.innerHTML='<div class="card"><p>No account found for <b>'+esc(email)+'</b>.</p></div>'; return; }
+  const a=acc.account, flags=(acc.flags||[]).slice();
+  const available=(bal && typeof bal.available==='number')?bal.available:null;
+  if(available!=null && available<=0) flags.unshift('Out of Aligned Credits - new renders are blocked');
+  let html='<div class="card">';
+  html+='<div style="font-size:18px;font-weight:800">'+esc(a.name||'(no name)')+' '+statusPill(a.status)+'</div>';
+  html+='<div class="muted" style="margin-top:2px">'+esc(a.email||email)+'</div>';
+
+  if(flags.length){ html+='<h3>Possible issues</h3>'; flags.forEach(f=>{ html+='<div class="flag">⚠️ <span>'+esc(f)+'</span></div>'; }); }
+  else { html+='<div class="ok" style="margin-top:14px">✓ No obvious account issues flagged.</div>'; }
+
+  html+='<div class="grid">';
+  html+='<div class="kv"><div class="k">Plan</div><div class="v">'+esc((a.plan||'-'))+'</div></div>';
+  const credits=(available!=null)?available:(Number(a.credits)||0);
+  const gu=(bal&&typeof bal.monthlyGrant==='number')?(' <span class="muted" style="font-size:11px;font-weight:500">('+(Number(bal.usedThisMonth)||0)+' used of '+bal.monthlyGrant+'/mo)</span>'):'';
+  html+='<div class="kv"><div class="k">Aligned Credits available</div><div class="v big" style="color:'+(credits>0?"#9be8b4":"#ffb4ad")+'">'+credits.toLocaleString()+'</div><div style="margin-top:2px">'+gu+'</div></div>';
+  html+='<div class="kv"><div class="k">Phone (for SMS)</div><div class="v">'+esc(a.phone||'- none')+'</div></div>';
+  html+='<div class="kv"><div class="k">Twin ready</div><div class="v">'+((a.twinReady||a.twinGroupId)?'Yes':'No')+'</div></div>';
+  html+='<div class="kv"><div class="k">SMS consent</div><div class="v">'+(a.smsConsent===false?'No':'Yes')+'</div></div>';
+  html+='<div class="kv"><div class="k">Last updated</div><div class="v" style="font-size:13px">'+esc((a.updatedAt||'').replace('T',' ').slice(0,16))+'</div></div>';
+  html+='</div>';
+
+  // Plan / daily engine
+  html+='<h3>30-day plan (daily video engine)</h3>';
+  if(plan && plan.found){
+    const p=plan.plan;
+    html+='<div class="grid">';
+    html+='<div class="kv"><div class="k">Plan active</div><div class="v">'+(p.active?'Yes':'<span style="color:#ffb4ad">No</span>')+'</div></div>';
+    html+='<div class="kv"><div class="k">Progress</div><div class="v">Day '+esc(p.lastRenderedDay==null?'?':p.lastRenderedDay)+' of '+esc(p.totalDays||'?')+'</div></div>';
+    html+='<div class="kv"><div class="k">Days with a script</div><div class="v">'+esc(p.daysWithScript)+' / '+esc(p.totalDays||'?')+'</div></div>';
+    html+='<div class="kv"><div class="k">Started</div><div class="v" style="font-size:13px">'+esc(String(p.startedAt||'-').replace('T',' ').slice(0,16))+'</div></div>';
+    html+='</div>';
+    html+='<details><summary>Raw plan data</summary><pre>'+esc(JSON.stringify(p.raw,null,2))+'</pre></details>';
+  } else {
+    html+='<div class="flag">⚠️ <span>No active 30-day plan in the daily engine. This customer will not get an automatic daily video until a plan is created and activated.</span></div>';
+  }
+
+  html+='<details><summary>Raw account data</summary><pre>'+esc(JSON.stringify(a,null,2))+'</pre></details>';
+  html+='</div>';
+  R.innerHTML=html;
+}
+
+async function listAll(){
+  const k=key(), R=document.getElementById('result');
+  if(!k){ R.innerHTML='<div class="err">Enter your admin key first.</div>'; return; }
+  R.innerHTML='<p class="muted">Loading all accounts…</p>';
+  let res;
+  try{ res=await post('/admin-account',{key:k,action:'list'}); }catch(e){ R.innerHTML='<div class="err">Couldn’t reach the server.</div>'; return; }
+  if(res && res.error){ R.innerHTML='<div class="err">'+esc(res.error==='unauthorized'?'That admin key is not valid.':res.error)+'</div>'; return; }
+  const accts=res.accounts||[];
+  let html='<div class="card"><div style="font-weight:800;margin-bottom:10px">'+accts.length+' accounts</div>';
+  accts.forEach(a=>{
+    const credits=Number(a.credits)||0;
+    html+='<div class="kv" style="margin-bottom:8px;cursor:pointer" onclick="document.getElementById(\'email\').value=\''+esc(a.email)+'\';lookup();window.scrollTo(0,0)">';
+    html+='<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap">';
+    html+='<div><b>'+esc(a.name||a.email)+'</b> '+statusPill(a.status)+'<div class="muted" style="font-size:12px">'+esc(a.email)+'</div></div>';
+    html+='<div style="text-align:right"><div class="muted" style="font-size:11px">'+esc(a.plan||'-')+'</div><div style="font-weight:700;color:'+(credits>0?'#9be8b4':'#ffb4ad')+'">'+credits.toLocaleString()+' cr</div></div>';
+    html+='</div></div>';
+  });
+  html+='</div>';
+  R.innerHTML=html;
+}
+</script>
+</body>
+</html>
